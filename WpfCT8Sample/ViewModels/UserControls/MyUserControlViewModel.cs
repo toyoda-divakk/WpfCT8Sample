@@ -23,5 +23,15 @@ namespace WpfCT8Sample.ViewModels.UserControls
         {
             TestButtonText = "Test Button Clicked";
         }
+
+        // BehaviorからViewModelのコマンドやメソッドを呼び出すようなことはできますか？
+        [RelayCommand]
+        public void TestButtonFromBehavior()
+        {
+            TestButtonText = "Test From Behavior";
+        }
+
+
+
     }
 }
