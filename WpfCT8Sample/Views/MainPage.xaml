@@ -11,6 +11,9 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
+    <Page.Resources>
+        <ResourceDictionary Source="../Style/StyleDictionary.xaml"/>
+    </Page.Resources>
     <Page.DataContext>
         <vm:MainPageViewModel />
     </Page.DataContext>
@@ -20,7 +23,10 @@
             <Button Background="Pink" Content="aaaa" />
 
             <uc:MyUserControl DataContext="{Binding UserControlViewModel}" />
+            
         </StackPanel>
 
+        <Calendar />
+        <Image Source="/Resources/th.png" Width="32" />
     </Grid>
 </Page>
