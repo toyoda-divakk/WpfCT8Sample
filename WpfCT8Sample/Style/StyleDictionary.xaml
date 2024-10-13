@@ -6,18 +6,23 @@
 
     <!--  https://learn.microsoft.com/ja-jp/dotnet/desktop/wpf/controls/calendar-styles-and-templates?view=netframeworkdesktop-4.8  -->
     <!--  Control colors.  -->
+    <!--  選択した日付の色  -->
     <Color x:Key="SelectedBackgroundColor">#FFC5CBF9</Color>
-    <Color x:Key="ControlLightColor">White</Color><!--背景-->
-    <Color x:Key="ControlMediumColor">#FF7381F9</Color><!--ヘッダ背景-->
-    <Color x:Key="ControlMouseOverColor">#FF3843C4</Color>
-    <Color x:Key="GlyphColor">#FF444444</Color>
-    <Color x:Key="GlyphMouseOver">sc#1, 0.004391443, 0.002428215, 0.242281124</Color>
-    <Color x:Key="BorderLightColor">#FFCCCCCC</Color><!--周囲-->
-    <Color x:Key="BorderDarkColor">#FF444444</Color><!--これも周囲-->
-
-    <!--ヘッダ背景-->
+    <!--  背景  -->
+    <Color x:Key="ControlLightColor">White</Color>
+    <!--  ヘッダ背景  -->
     <Color x:Key="HeaderTopColor">#FFC5CBF9</Color>
+    <Color x:Key="ControlMediumColor">#FF7381F9</Color>
+    <!--  マウスオーバーした日付  -->
+    <Color x:Key="ControlMouseOverColor">#FF3843C4</Color>
+    <!--  マウスオーバーした左右ボタン  -->
+    <Color x:Key="GlyphMouseOver">sc#1, 0.004391443, 0.002428215, 0.242281124</Color>
+    <!--  周囲  -->
+    <Color x:Key="BorderLightColor">#FFCCCCCC</Color>
+    <!--  これも周囲  -->
+    <Color x:Key="BorderDarkColor">#FF444444</Color>
 
+    <!--  テキスト  -->
     <Color x:Key="TextForeground">#FF333333</Color>
 
 
@@ -32,7 +37,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="CalendarDayButton">
-                    <Grid>
+                    <Grid x:Name="DayButtonGrid">
                         <Rectangle
                             x:Name="TodayBackground"
                             Opacity="0"
@@ -187,6 +192,14 @@
                                 <VisualState Name="Active" />
                                 <VisualState Name="Inactive">
                                     <Storyboard>
+                                        <!--  他の月の日付を非表示にするにはこのようにする  -->
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DayButtonGrid" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Collapsed</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
                                         <ColorAnimation
                                             Storyboard.TargetName="NormalText"
                                             Storyboard.TargetProperty="(TextElement.Foreground).                       (SolidColorBrush.Color)"
@@ -272,8 +285,10 @@
                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
                             <TextElement.Foreground>
-                                <SolidColorBrush Color="#FF333333" />
+                                <SolidColorBrush Color="{StaticResource TextForeground}" />
                             </TextElement.Foreground>
+                            <TextElement.FontFamily>Meiryo UI</TextElement.FontFamily>
+                            <TextElement.FontSize>14</TextElement.FontSize>
                         </ContentPresenter>
                         <Rectangle
                             x:Name="CalendarButtonFocusVisual"
@@ -547,7 +562,7 @@
                                 VerticalAlignment="Center"
                                 FontFamily="Meiryo UI"
                                 FontSize="12"
-                                Foreground="#FF333333"
+                                Foreground="{StaticResource TextForeground}"
                                 Text="{Binding}" />
                         </DataTemplate>
                     </ControlTemplate.Resources>
@@ -560,6 +575,7 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="1">
+                            <!--  TODO:周りの色  -->
                             <Border
                                 BorderBrush="#FFFFFFFF"
                                 BorderThickness="2"
