@@ -6,6 +6,7 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:local="clr-namespace:WpfCT8Sample.Behaviors"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:uc="clr-namespace:WpfCT8Sample.Views.UserControls"
     xmlns:usercontrols="clr-namespace:WpfCT8Sample.ViewModels.UserControls"
     d:DataContext="{d:DesignInstance Type=usercontrols:MyUserControlViewModel}"
     d:DesignHeight="450"
@@ -13,7 +14,6 @@
     mc:Ignorable="d">
     <Grid>
         <StackPanel>
-
             <Button Command="{Binding TestButtonCommand}" Content="{Binding TestButtonText}">
                 <i:Interaction.Behaviors>
                     <local:MouseEnterLeaveBehavior />
@@ -32,6 +32,11 @@
                     <local:CommandBehavior Command="{Binding TestButtonFromBehaviorCommand}" />
                 </i:Interaction.Behaviors>
             </Rectangle>
+            <uc:MyCanvas
+                Width="400"
+                Height="300"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top" />
         </StackPanel>
     </Grid>
 </UserControl>

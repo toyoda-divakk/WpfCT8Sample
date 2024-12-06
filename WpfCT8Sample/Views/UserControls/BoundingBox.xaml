@@ -1,0 +1,98 @@
+﻿<UserControl
+    x:Class="WpfCT8Sample.Views.UserControls.BoundingBox"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cv="clr-namespace:WpfCT8Sample.Converter"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:WpfCT8Sample.Views.UserControls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="clr-namespace:System;assembly=netstandard"
+    x:Name="root"
+    Canvas.Left="{Binding Position.X, Mode=TwoWay, RelativeSource={RelativeSource Self}}"
+    Canvas.Top="{Binding Position.Y, Mode=TwoWay, RelativeSource={RelativeSource Self}}"
+    Width="{Binding Size.Width, Mode=TwoWay, RelativeSource={RelativeSource Self}}"
+    Height="{Binding Size.Height, Mode=TwoWay, RelativeSource={RelativeSource Self}}"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="StrokeBorderColor" Color="#1A73E8" />
+        <SolidColorBrush x:Key="StrokeFillColor" Color="#CFE2F3" />
+        <SolidColorBrush x:Key="RectangleFillColor" Color="#CFE2F3" />
+        <sys:Double x:Key="HandlerSize">8</sys:Double>
+        <sys:Double x:Key="HandlerOffset">-4</sys:Double>
+        <cv:CentredPositionConverter x:Key="CentredPositionConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <Rectangle
+            x:Name="boundingBoxRectangle"
+            Fill="{StaticResource StrokeFillColor}"
+            MouseLeftButtonDown="BoundingBox_MouseLeftButtonDown"
+            MouseLeftButtonUp="BoundingBox_MouseLeftButtonUp"
+            MouseMove="BoundingBox_MouseMove"
+            Opacity="0.5"
+            Stroke="{StaticResource StrokeBorderColor}"
+            StrokeThickness="1" />
+        <Canvas>
+            <Ellipse
+                x:Name="rotationHandler"
+                Canvas.Left="{Binding Size.Width, ElementName=root, Converter={StaticResource CentredPositionConverter}, ConverterParameter={StaticResource HandlerSize}}"
+                Canvas.Top="-20"
+                Width="{StaticResource HandlerSize}"
+                Height="{StaticResource HandlerSize}"
+                Fill="{StaticResource StrokeBorderColor}"
+                Stroke="{StaticResource RectangleFillColor}" />
+            <!--<Line
+                x:Name="rotationHandlerLine"
+                Stroke="Red"
+                StrokeThickness="2"
+                X1="{Binding Width, ElementName=boundingBoxRectangle, Converter={StaticResource CentredPositionConverter}, ConverterParameter={StaticResource HandlerSize}}"
+                X2="{Binding Width, ElementName=boundingBoxRectangle, Converter={StaticResource CentredPositionConverter}, ConverterParameter={StaticResource HandlerSize}}"
+                Y1="0"
+                Y2="{Binding Top, ElementName=rotationHandler, Converter={StaticResource CentredPositionConverter}, ConverterParameter={StaticResource HandlerSize}}" />-->
+            <Rectangle
+                x:Name="dragTopLeft"
+                Canvas.Left="{StaticResource HandlerOffset}"
+                Canvas.Top="{StaticResource HandlerOffset}"
+                Width="{StaticResource HandlerSize}"
+                Height="{StaticResource HandlerSize}"
+                Fill="{StaticResource StrokeBorderColor}"
+                MouseLeftButtonDown="DragTopLeft_MouseLeftButtonDown"
+                MouseLeftButtonUp="DragThumb_MouseLeftButtonUp"
+                MouseMove="DragTopLeft_MouseMove"
+                Stroke="{StaticResource RectangleFillColor}" />
+            <Rectangle
+                x:Name="dragTopRight"
+                Canvas.Top="{StaticResource HandlerOffset}"
+                Canvas.Right="{StaticResource HandlerOffset}"
+                Width="{StaticResource HandlerSize}"
+                Height="{StaticResource HandlerSize}"
+                Fill="{StaticResource StrokeBorderColor}"
+                MouseLeftButtonDown="DragTopRight_MouseLeftButtonDown"
+                MouseLeftButtonUp="DragThumb_MouseLeftButtonUp"
+                MouseMove="DragTopRight_MouseMove"
+                Stroke="{StaticResource RectangleFillColor}" />
+            <Rectangle
+                x:Name="dragBottomLeft"
+                Canvas.Left="{StaticResource HandlerOffset}"
+                Canvas.Bottom="{StaticResource HandlerOffset}"
+                Width="{StaticResource HandlerSize}"
+                Height="{StaticResource HandlerSize}"
+                Fill="{StaticResource StrokeBorderColor}"
+                MouseLeftButtonDown="DragBottomLeft_MouseLeftButtonDown"
+                MouseLeftButtonUp="DragThumb_MouseLeftButtonUp"
+                MouseMove="DragBottomLeft_MouseMove"
+                Stroke="{StaticResource RectangleFillColor}" />
+            <Rectangle
+                x:Name="dragBottomRight"
+                Canvas.Right="{StaticResource HandlerOffset}"
+                Canvas.Bottom="{StaticResource HandlerOffset}"
+                Width="{StaticResource HandlerSize}"
+                Height="{StaticResource HandlerSize}"
+                Fill="{StaticResource StrokeBorderColor}"
+                MouseLeftButtonDown="DragBottomRight_MouseLeftButtonDown"
+                MouseLeftButtonUp="DragThumb_MouseLeftButtonUp"
+                MouseMove="DragBottomRight_MouseMove"
+                Stroke="{StaticResource RectangleFillColor}" />
+
+        </Canvas>
+    </Grid>
+</UserControl>

@@ -562,7 +562,7 @@
                                 VerticalAlignment="Center"
                                 FontFamily="Meiryo UI"
                                 FontSize="12"
-                                Foreground="{StaticResource TextForeground}"
+                                Foreground="#FF333333"
                                 Text="{Binding}" />
                         </DataTemplate>
                     </ControlTemplate.Resources>
