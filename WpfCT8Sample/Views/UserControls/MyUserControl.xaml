@@ -14,7 +14,7 @@
     mc:Ignorable="d">
     <Grid>
         <StackPanel>
-            <Button Command="{Binding TestButtonCommand}" Content="{Binding TestButtonText}">
+            <!--<Button Command="{Binding TestButtonCommand}" Content="{Binding TestButtonText}">
                 <i:Interaction.Behaviors>
                     <local:MouseEnterLeaveBehavior />
                 </i:Interaction.Behaviors>
@@ -23,15 +23,15 @@
                 <i:Interaction.Behaviors>
                     <local:CommandBehavior Command="{Binding TestButtonFromBehaviorCommand}" />
                 </i:Interaction.Behaviors>
-            </Button>
-            <Rectangle
+            </Button>-->
+            <!--<Rectangle
                 Width="100"
                 Height="16"
                 Fill="SeaGreen">
                 <i:Interaction.Behaviors>
                     <local:CommandBehavior Command="{Binding TestButtonFromBehaviorCommand}" />
                 </i:Interaction.Behaviors>
-            </Rectangle>
+            </Rectangle>-->
             <uc:MyCanvas
                 Width="400"
                 Height="300"

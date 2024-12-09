@@ -12,7 +12,7 @@ namespace WpfCT8Sample.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (double)value / 2 - (double)parameter / 2;
+            return (double)value / 2 - (parameter == null ? 0 : (double)parameter / 2);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

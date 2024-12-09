@@ -20,8 +20,7 @@ namespace WpfCT8Sample.Views.UserControls
     /// </summary>
     public partial class BoundingBox : UserControl
     {
-        public static readonly DependencyProperty PositionProperty = DependencyProperty.Register(
-            "Position", typeof(Point), typeof(BoundingBox), new PropertyMetadata(default(Point)));
+        public static readonly DependencyProperty PositionProperty = DependencyProperty.Register("Position", typeof(Point), typeof(BoundingBox), new PropertyMetadata(default(Point)));
 
         public Point Position
         {
@@ -29,10 +28,7 @@ namespace WpfCT8Sample.Views.UserControls
             set => SetValue(PositionProperty, value);
         }
 
-        //public static readonly DependencyProperty SizeProperty = DependencyProperty.Register(
-        //    "Size", typeof(Size), typeof(BoundingBox), new PropertyMetadata(default(Size)));
-        public static readonly DependencyProperty SizeProperty = DependencyProperty.Register(
-            "Size", typeof(Size), typeof(BoundingBox), new PropertyMetadata(new Size(100, 100)));
+        public static readonly DependencyProperty SizeProperty = DependencyProperty.Register("Size", typeof(Size), typeof(BoundingBox), new PropertyMetadata(new Size(100, 100)));
 
         public Size Size
         {
@@ -40,13 +36,12 @@ namespace WpfCT8Sample.Views.UserControls
             set => SetValue(SizeProperty, value);
         }
 
-        public static readonly DependencyProperty AngleProperty = DependencyProperty.Register(
-            "Angle", typeof(double), typeof(BoundingBox), new PropertyMetadata(default(double)));
+        public static readonly DependencyProperty RotationProperty = DependencyProperty.Register("Rotation", typeof(double), typeof(BoundingBox), new PropertyMetadata(default(double)));
 
-        public double Angle
+        public double Rotation  // degree
         {
-            get => (double)GetValue(AngleProperty);
-            set => SetValue(AngleProperty, value);
+            get => (double)GetValue(RotationProperty);
+            set => SetValue(RotationProperty, value);
         }
 
         public BoundingBox()
@@ -75,17 +70,12 @@ namespace WpfCT8Sample.Views.UserControls
         }
 
 
-        private void BoundingBox_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            Mouse.Capture(null);
-        }
-
-
         private void DragThumb_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             Mouse.Capture(null);
         }
 
+        #region Drag four corners
         private void DragTopLeft_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _startPoint = e.GetPosition((IInputElement)Parent);
@@ -172,5 +162,110 @@ namespace WpfCT8Sample.Views.UserControls
             Size = new Size(newWidth, Math.Max(Size.Height + offset.Y, 0));
             Position = new Point(newX, Position.Y);
         }
+        #endregion
+
+        #region Drag four sides
+        private void DragTop_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _startPoint = e.GetPosition((IInputElement)Parent);
+            Mouse.Capture(dragTop);
+        }
+
+        private void DragTop_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Released)
+                return;
+
+            var currentPoint = e.GetPosition((IInputElement)Parent);
+            var offset = currentPoint - _startPoint;
+            _startPoint = currentPoint;
+
+            var newHeight = Math.Max(Size.Height - offset.Y, 0);
+            var newY = Math.Min(Position.Y + offset.Y, Position.Y + Size.Height);
+
+            Size = new Size(Size.Width, newHeight);
+            Position = new Point(Position.X, newY);
+        }
+
+        private void DragBottom_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _startPoint = e.GetPosition((IInputElement)Parent);
+            Mouse.Capture(dragBottom);
+        }
+
+        private void DragBottom_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Released)
+                return;
+
+            var currentPoint = e.GetPosition((IInputElement)Parent);
+            var offset = currentPoint - _startPoint;
+            _startPoint = currentPoint;
+
+            Size = new Size(Size.Width, Math.Max(Size.Height + offset.Y, 0));
+        }
+
+        private void DragLeft_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _startPoint = e.GetPosition((IInputElement)Parent);
+            Mouse.Capture(dragLeft);
+        }
+
+        private void DragLeft_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Released)
+                return;
+
+            var currentPoint = e.GetPosition((IInputElement)Parent);
+            var offset = currentPoint - _startPoint;
+            _startPoint = currentPoint;
+
+            var newWidth = Math.Max(Size.Width - offset.X, 0);
+            var newX = Math.Min(Position.X + offset.X, Position.X + Size.Width);
+
+            Size = new Size(newWidth, Size.Height);
+            Position = new Point(newX, Position.Y);
+        }
+
+        private void DragRight_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _startPoint = e.GetPosition((IInputElement)Parent);
+            Mouse.Capture(dragRight);
+        }
+
+        private void DragRight_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Released)
+                return;
+
+            var currentPoint = e.GetPosition((IInputElement)Parent);
+            var offset = currentPoint - _startPoint;
+            _startPoint = currentPoint;
+
+            Size = new Size(Math.Max(Size.Width + offset.X, 0), Size.Height);
+        }
+        #endregion
+
+        #region Rotation
+
+        private void RotationHandler_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _startPoint = e.GetPosition((IInputElement)Parent);
+            Mouse.Capture(rotationHandler);
+        }
+
+        private void RotationHandler_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Released)
+                return;
+
+            var currentPoint = e.GetPosition((IInputElement)Parent);
+            var centerX = Position.X + Size.Width / 2;
+            var centerY = Position.Y + Size.Height / 2;
+            double angle = Math.Atan2(currentPoint.Y - centerY, currentPoint.X - centerX) + Math.PI / 2;
+            Rotation = angle * 180 / Math.PI;
+        }
+        #endregion
+
     }
 }

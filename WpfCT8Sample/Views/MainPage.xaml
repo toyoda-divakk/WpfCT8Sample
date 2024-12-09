@@ -19,11 +19,11 @@
     </Page.DataContext>
     <Grid>
         <StackPanel>
-            <Button Background="Blue" Content="{Binding TestButtonText}" />
+            <Button Content="{Binding TestButtonText}" />
             <uc:MyUserControl DataContext="{Binding UserControlViewModel}" />
         </StackPanel>
 
         <!--<Calendar />-->
-        <Image Width="32" Source="/Resources/th.png" />
+        <!--<Image Width="32" Source="/Resources/th.png" />-->
     </Grid>
 </Page>

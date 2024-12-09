@@ -21,12 +21,23 @@
         <sys:Double x:Key="HandlerOffset">-4</sys:Double>
         <cv:CentredPositionConverter x:Key="CentredPositionConverter" />
     </UserControl.Resources>
+    <UserControl.RenderTransform>
+        <RotateTransform Angle="{Binding Rotation, ElementName=root}" CenterX="{Binding Size.Width, ElementName=root, Converter={StaticResource CentredPositionConverter}}" CenterY="{Binding Size.Height, ElementName=root, Converter={StaticResource CentredPositionConverter}}" />
+    </UserControl.RenderTransform>
     <Grid>
+        <Line
+            x:Name="connectionLine"
+            Stroke="{StaticResource StrokeBorderColor}"
+            StrokeThickness="1"
+            X1="{Binding Size.Width, ElementName=root, Converter={StaticResource CentredPositionConverter}}"
+            X2="{Binding Size.Width, ElementName=root, Converter={StaticResource CentredPositionConverter}}"
+            Y1="0"
+            Y2="-16" />
         <Rectangle
             x:Name="boundingBoxRectangle"
             Fill="{StaticResource StrokeFillColor}"
             MouseLeftButtonDown="BoundingBox_MouseLeftButtonDown"
-            MouseLeftButtonUp="BoundingBox_MouseLeftButtonUp"
+            MouseLeftButtonUp="DragThumb_MouseLeftButtonUp"
             MouseMove="BoundingBox_MouseMove"
             Opacity="0.5"
             Stroke="{StaticResource StrokeBorderColor}"
@@ -39,15 +50,10 @@
                 Width="{StaticResource HandlerSize}"
                 Height="{StaticResource HandlerSize}"
                 Fill="{StaticResource StrokeBorderColor}"
+                MouseLeftButtonDown="RotationHandler_MouseLeftButtonDown"
+                MouseLeftButtonUp="DragThumb_MouseLeftButtonUp"
+                MouseMove="RotationHandler_MouseMove"
                 Stroke="{StaticResource RectangleFillColor}" />
-            <!--<Line
-                x:Name="rotationHandlerLine"
-                Stroke="Red"
-                StrokeThickness="2"
-                X1="{Binding Width, ElementName=boundingBoxRectangle, Converter={StaticResource CentredPositionConverter}, ConverterParameter={StaticResource HandlerSize}}"
-                X2="{Binding Width, ElementName=boundingBoxRectangle, Converter={StaticResource CentredPositionConverter}, ConverterParameter={StaticResource HandlerSize}}"
-                Y1="0"
-                Y2="{Binding Top, ElementName=rotationHandler, Converter={StaticResource CentredPositionConverter}, ConverterParameter={StaticResource HandlerSize}}" />-->
             <Rectangle
                 x:Name="dragTopLeft"
                 Canvas.Left="{StaticResource HandlerOffset}"
@@ -92,7 +98,64 @@
                 MouseLeftButtonUp="DragThumb_MouseLeftButtonUp"
                 MouseMove="DragBottomRight_MouseMove"
                 Stroke="{StaticResource RectangleFillColor}" />
-
+            <Rectangle
+                x:Name="dragTop"
+                Canvas.Left="{Binding Size.Width, ElementName=root, Converter={StaticResource CentredPositionConverter}, ConverterParameter={StaticResource HandlerSize}}"
+                Canvas.Top="{StaticResource HandlerOffset}"
+                Width="{StaticResource HandlerSize}"
+                Height="{StaticResource HandlerSize}"
+                Fill="{StaticResource StrokeBorderColor}"
+                MouseLeftButtonDown="DragTop_MouseLeftButtonDown"
+                MouseLeftButtonUp="DragThumb_MouseLeftButtonUp"
+                MouseMove="DragTop_MouseMove"
+                Stroke="{StaticResource RectangleFillColor}" />
+            <Rectangle
+                x:Name="dragBottom"
+                Canvas.Left="{Binding Size.Width, ElementName=root, Converter={StaticResource CentredPositionConverter}, ConverterParameter={StaticResource HandlerSize}}"
+                Canvas.Bottom="{StaticResource HandlerOffset}"
+                Width="{StaticResource HandlerSize}"
+                Height="{StaticResource HandlerSize}"
+                Fill="{StaticResource StrokeBorderColor}"
+                MouseLeftButtonDown="DragBottom_MouseLeftButtonDown"
+                MouseLeftButtonUp="DragThumb_MouseLeftButtonUp"
+                MouseMove="DragBottom_MouseMove"
+                Stroke="{StaticResource RectangleFillColor}" />
+            <Rectangle
+                x:Name="dragLeft"
+                Canvas.Left="{StaticResource HandlerOffset}"
+                Canvas.Top="{Binding Size.Height, ElementName=root, Converter={StaticResource CentredPositionConverter}, ConverterParameter={StaticResource HandlerSize}}"
+                Width="{StaticResource HandlerSize}"
+                Height="{StaticResource HandlerSize}"
+                Fill="{StaticResource StrokeBorderColor}"
+                MouseLeftButtonDown="DragLeft_MouseLeftButtonDown"
+                MouseLeftButtonUp="DragThumb_MouseLeftButtonUp"
+                MouseMove="DragLeft_MouseMove"
+                Stroke="{StaticResource RectangleFillColor}" />
+            <Rectangle
+                x:Name="dragRight"
+                Canvas.Top="{Binding Size.Height, ElementName=root, Converter={StaticResource CentredPositionConverter}, ConverterParameter={StaticResource HandlerSize}}"
+                Canvas.Right="{StaticResource HandlerOffset}"
+                Width="{StaticResource HandlerSize}"
+                Height="{StaticResource HandlerSize}"
+                Fill="{StaticResource StrokeBorderColor}"
+                MouseLeftButtonDown="DragRight_MouseLeftButtonDown"
+                MouseLeftButtonUp="DragThumb_MouseLeftButtonUp"
+                MouseMove="DragRight_MouseMove"
+                Stroke="{StaticResource RectangleFillColor}" />
         </Canvas>
+        <StackPanel Margin="8">
+            <TextBlock
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Text="{Binding Position, ElementName=root, StringFormat='Position: {0}'}" />
+            <TextBlock
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Text="{Binding Size, ElementName=root, StringFormat='Size: {0}'}" />
+            <TextBlock
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Text="{Binding Rotation, ElementName=root, StringFormat='Rotation Angle: {0:0.###}'}" />
+        </StackPanel>
     </Grid>
 </UserControl>
