@@ -13,6 +13,9 @@
     Width="{Binding Size.Width, Mode=TwoWay, RelativeSource={RelativeSource Self}}"
     Height="{Binding Size.Height, Mode=TwoWay, RelativeSource={RelativeSource Self}}"
     mc:Ignorable="d">
+    <UserControl.LayoutTransform>
+        <ScaleTransform ScaleX="{Binding Zoom, ElementName=root}" ScaleY="{Binding Zoom, ElementName=root}" />
+    </UserControl.LayoutTransform>
     <UserControl.Resources>
         <SolidColorBrush x:Key="StrokeBorderColor" Color="#1A73E8" />
         <SolidColorBrush x:Key="StrokeFillColor" Color="#CFE2F3" />
@@ -22,7 +25,7 @@
         <cv:CentredPositionConverter x:Key="CentredPositionConverter" />
     </UserControl.Resources>
     <UserControl.RenderTransform>
-        <RotateTransform Angle="{Binding Rotation, ElementName=root}" CenterX="{Binding Size.Width, ElementName=root, Converter={StaticResource CentredPositionConverter}}" CenterY="{Binding Size.Height, ElementName=root, Converter={StaticResource CentredPositionConverter}}" />
+        <RotateTransform Angle="{Binding Rotation, ElementName=root}" CenterX="{Binding CenterX, ElementName=root}" CenterY="{Binding CenterY, ElementName=root}" />
     </UserControl.RenderTransform>
     <Grid>
         <Line

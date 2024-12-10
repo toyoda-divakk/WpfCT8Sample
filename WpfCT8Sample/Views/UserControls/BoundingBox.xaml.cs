@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace WpfCT8Sample.Views.UserControls
     /// <summary>
     /// BoundingBox.xaml の相互作用ロジック
     /// </summary>
-    public partial class BoundingBox : UserControl
+    public partial class BoundingBox : UserControl, INotifyPropertyChanged
     {
         public static readonly DependencyProperty PositionProperty = DependencyProperty.Register("Position", typeof(Point), typeof(BoundingBox), new PropertyMetadata(default(Point)));
 
@@ -28,7 +29,7 @@ namespace WpfCT8Sample.Views.UserControls
             set => SetValue(PositionProperty, value);
         }
 
-        public static readonly DependencyProperty SizeProperty = DependencyProperty.Register("Size", typeof(Size), typeof(BoundingBox), new PropertyMetadata(new Size(100, 100)));
+        public static readonly DependencyProperty SizeProperty = DependencyProperty.Register("Size", typeof(Size), typeof(BoundingBox), new PropertyMetadata(new Size(100, 100), OnSizeOrZoomChanged));
 
         public Size Size
         {
@@ -42,6 +43,33 @@ namespace WpfCT8Sample.Views.UserControls
         {
             get => (double)GetValue(RotationProperty);
             set => SetValue(RotationProperty, value);
+        }
+
+        public static readonly DependencyProperty ZoomProperty = DependencyProperty.Register("Zoom", typeof(double), typeof(BoundingBox), new PropertyMetadata(1.0, OnSizeOrZoomChanged));
+
+        public double Zoom
+        {
+            get => (double)GetValue(ZoomProperty);
+            set => SetValue(ZoomProperty, value);
+        }
+
+        public double CenterX => (Size.Width / 2) * Zoom;
+        public double CenterY => (Size.Height / 2) * Zoom;
+
+        private static void OnSizeOrZoomChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is BoundingBox boundingBox)
+            {
+                boundingBox.OnPropertyChanged(nameof(CenterX));
+                boundingBox.OnPropertyChanged(nameof(CenterY));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public BoundingBox()
@@ -88,14 +116,14 @@ namespace WpfCT8Sample.Views.UserControls
                 return;
 
             var currentPoint = e.GetPosition((IInputElement)Parent);
-            var offset = currentPoint - _startPoint;
+            var offset = (currentPoint - _startPoint) / Zoom;
             _startPoint = currentPoint;
 
             var newWidth = Math.Max(Size.Width - offset.X, 0);
-            var newX = Math.Min(Position.X + offset.X, Position.X + Size.Width);
+            var newX = Math.Min(Position.X + offset.X * Zoom, Position.X + Size.Width);
 
             var newHeight = Math.Max(Size.Height - offset.Y, 0);
-            var newY = Math.Min(Position.Y + offset.Y, Position.Y + Size.Height);
+            var newY = Math.Min(Position.Y + offset.Y * Zoom, Position.Y + Size.Height);
 
             Size = new Size(newWidth, newHeight);
             Position = new Point(newX, newY);
@@ -113,7 +141,7 @@ namespace WpfCT8Sample.Views.UserControls
                 return;
 
             var currentPoint = e.GetPosition((IInputElement)Parent);
-            var offset = currentPoint - _startPoint;
+            var offset = (currentPoint - _startPoint) / Zoom;
             _startPoint = currentPoint;
 
             Size = new Size(Math.Max(Size.Width + offset.X, 0), Math.Max(Size.Height + offset.Y, 0));
@@ -131,11 +159,11 @@ namespace WpfCT8Sample.Views.UserControls
                 return;
 
             var currentPoint = e.GetPosition((IInputElement)Parent);
-            var offset = currentPoint - _startPoint;
+            var offset = (currentPoint - _startPoint) / Zoom;
             _startPoint = currentPoint;
 
             var newHeight = Math.Max(Size.Height - offset.Y, 0);
-            var newY = Math.Min(Position.Y + offset.Y, Position.Y + Size.Height);
+            var newY = Math.Min(Position.Y + offset.Y * Zoom, Position.Y + Size.Height);
 
             Size = new Size(Math.Max(Size.Width + offset.X, 0), newHeight);
             Position = new Point(Position.X, newY);
@@ -153,11 +181,11 @@ namespace WpfCT8Sample.Views.UserControls
                 return;
 
             var currentPoint = e.GetPosition((IInputElement)Parent);
-            var offset = currentPoint - _startPoint;
+            var offset = (currentPoint - _startPoint) / Zoom;
             _startPoint = currentPoint;
 
             var newWidth = Math.Max(Size.Width - offset.X, 0);
-            var newX = Math.Min(Position.X + offset.X, Position.X + Size.Width);
+            var newX = Math.Min(Position.X + offset.X * Zoom, Position.X + Size.Width);
 
             Size = new Size(newWidth, Math.Max(Size.Height + offset.Y, 0));
             Position = new Point(newX, Position.Y);
@@ -177,11 +205,11 @@ namespace WpfCT8Sample.Views.UserControls
                 return;
 
             var currentPoint = e.GetPosition((IInputElement)Parent);
-            var offset = currentPoint - _startPoint;
+            var offset = (currentPoint - _startPoint) / Zoom;
             _startPoint = currentPoint;
 
             var newHeight = Math.Max(Size.Height - offset.Y, 0);
-            var newY = Math.Min(Position.Y + offset.Y, Position.Y + Size.Height);
+            var newY = Math.Min(Position.Y + offset.Y * Zoom, Position.Y + Size.Height);
 
             Size = new Size(Size.Width, newHeight);
             Position = new Point(Position.X, newY);
@@ -199,7 +227,7 @@ namespace WpfCT8Sample.Views.UserControls
                 return;
 
             var currentPoint = e.GetPosition((IInputElement)Parent);
-            var offset = currentPoint - _startPoint;
+            var offset = (currentPoint - _startPoint) / Zoom;
             _startPoint = currentPoint;
 
             Size = new Size(Size.Width, Math.Max(Size.Height + offset.Y, 0));
@@ -217,11 +245,11 @@ namespace WpfCT8Sample.Views.UserControls
                 return;
 
             var currentPoint = e.GetPosition((IInputElement)Parent);
-            var offset = currentPoint - _startPoint;
+            var offset = (currentPoint - _startPoint) / Zoom;
             _startPoint = currentPoint;
 
             var newWidth = Math.Max(Size.Width - offset.X, 0);
-            var newX = Math.Min(Position.X + offset.X, Position.X + Size.Width);
+            var newX = Math.Min(Position.X + offset.X * Zoom, Position.X + Size.Width);
 
             Size = new Size(newWidth, Size.Height);
             Position = new Point(newX, Position.Y);
@@ -239,7 +267,7 @@ namespace WpfCT8Sample.Views.UserControls
                 return;
 
             var currentPoint = e.GetPosition((IInputElement)Parent);
-            var offset = currentPoint - _startPoint;
+            var offset = (currentPoint - _startPoint) / Zoom;
             _startPoint = currentPoint;
 
             Size = new Size(Math.Max(Size.Width + offset.X, 0), Size.Height);
@@ -260,8 +288,8 @@ namespace WpfCT8Sample.Views.UserControls
                 return;
 
             var currentPoint = e.GetPosition((IInputElement)Parent);
-            var centerX = Position.X + Size.Width / 2;
-            var centerY = Position.Y + Size.Height / 2;
+            var centerX = Position.X + CenterX;
+            var centerY = Position.Y + CenterY;
             double angle = Math.Atan2(currentPoint.Y - centerY, currentPoint.X - centerX) + Math.PI / 2;
             Rotation = angle * 180 / Math.PI;
         }
