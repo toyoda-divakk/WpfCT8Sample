@@ -33,10 +33,9 @@
                 </i:Interaction.Behaviors>
             </Rectangle>-->
             <uc:MyCanvas
-                Width="400"
-                Height="300"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top" />
+                ActualSize="{Binding ActualSize, Mode=OneWayToSource}"
+                DataContext="{Binding MyCanvasViewModel}"
+                SourceSize="{Binding SourceSize, Mode=OneWayToSource}" />
         </StackPanel>
     </Grid>
 </UserControl>

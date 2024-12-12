@@ -20,9 +20,41 @@ namespace WpfCT8Sample.Views.UserControls
     /// </summary>
     public partial class MyCanvas : UserControl
     {
+        // 画像の解像度をViewModelに伝えるための依存関係プロパティ
+        // 現在の画像の表示サイズ（縮尺）
+        public static readonly DependencyProperty ActualSizeProperty =
+            DependencyProperty.Register("ActualSize", typeof(Size), typeof(MyCanvas), new PropertyMetadata(default(Size)));
+
+        public Size ActualSize
+        {
+            get => (Size)GetValue(ActualSizeProperty);
+            set => SetValue(ActualSizeProperty, value);
+        }
+
+        // 元の画像のサイズ
+        public static readonly DependencyProperty SourceSizeProperty =
+            DependencyProperty.Register("SourceSize", typeof(Size), typeof(MyCanvas), new PropertyMetadata(default(Size)));
+
+        public Size SourceSize
+        {
+            get => (Size)GetValue(SourceSizeProperty);
+            set => SetValue(SourceSizeProperty, value);
+        }
+
         public MyCanvas()
         {
             InitializeComponent();
+        }
+
+        // 画面の拡大縮小時に画像のサイズを取得する
+        private void OnImageSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var image = (Image)sender;
+            ActualSize = new Size(image.ActualWidth, image.ActualHeight);
+            if (image.Source != null)
+            {
+                SourceSize = new Size(image.Source.Width, image.Source.Height);
+            }
         }
     }
 }

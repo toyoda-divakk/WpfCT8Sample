@@ -42,7 +42,6 @@
             MouseLeftButtonDown="BoundingBox_MouseLeftButtonDown"
             MouseLeftButtonUp="DragThumb_MouseLeftButtonUp"
             MouseMove="BoundingBox_MouseMove"
-            Opacity="0.5"
             Stroke="{StaticResource StrokeBorderColor}"
             StrokeThickness="1" />
         <Canvas>

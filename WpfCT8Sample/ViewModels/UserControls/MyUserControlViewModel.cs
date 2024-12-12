@@ -11,11 +11,15 @@ namespace WpfCT8Sample.ViewModels.UserControls
     internal partial class MyUserControlViewModel : ObservableObject
     {
         [ObservableProperty]
+        private MyCanvasViewModel _myCanvasViewModel;
+
+        [ObservableProperty]
         public string _testButtonText;
 
         public MyUserControlViewModel()
         {
             TestButtonText = "Click Me";
+            MyCanvasViewModel = new MyCanvasViewModel();
         }
 
         [RelayCommand]
@@ -24,7 +28,6 @@ namespace WpfCT8Sample.ViewModels.UserControls
             TestButtonText = "Test Button Clicked";
         }
 
-        // BehaviorからViewModelのコマンドやメソッドを呼び出すようなことはできますか？
         [RelayCommand]
         public void TestButtonFromBehavior()
         {

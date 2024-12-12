@@ -5,8 +5,29 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:WpfCT8Sample.Views.UserControls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:usercontrols="clr-namespace:WpfCT8Sample.ViewModels.UserControls"
+    d:DataContext="{d:DesignInstance Type=usercontrols:MyCanvasViewModel}"
     mc:Ignorable="d">
-    <Canvas>
-        <local:BoundingBox />
-    </Canvas>
+    <StackPanel>
+        <Button Command="{Binding MakePolygonCommand}" Content="Make Polygon" />
+        <Grid>
+            <Image SizeChanged="OnImageSizeChanged" Source="{Binding ImageUri}">
+                <Image.RenderTransform>
+                    <ScaleTransform ScaleX="1" ScaleY="1" />
+                </Image.RenderTransform>
+            </Image>
+            <Canvas>
+                <Path
+                    Data="{Binding BoundingBoxGeometry, Mode=OneWay}"
+                    Fill="Yellow"
+                    Stroke="Red"
+                    StrokeThickness="1" />
+                <local:BoundingBox
+                    x:Name="bounding"
+                    Position="{Binding Position, Mode=TwoWay}"
+                    Rotation="{Binding Rotation, Mode=TwoWay}"
+                    Size="{Binding Size, Mode=TwoWay}" />
+            </Canvas>
+        </Grid>
+    </StackPanel>
 </UserControl>
