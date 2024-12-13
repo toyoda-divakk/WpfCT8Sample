@@ -16,7 +16,7 @@ namespace WpfCT8Sample.ViewModels.UserControls
         [ObservableProperty]
         public Uri _imageUri;
         [ObservableProperty]
-        private Point _position = new(0, 0);
+        private Point _position = new(100, 100);
         [ObservableProperty]
         private Size _size = new(100, 100);
         [ObservableProperty]
@@ -26,9 +26,25 @@ namespace WpfCT8Sample.ViewModels.UserControls
 
         // MyCanvas.xaml.csのActualSizeとSourceSizeに対応するプロパティ
         [ObservableProperty]
-        private Size _actualSize;
-        [ObservableProperty]
         private Size _sourceSize;
+        [ObservableProperty]
+        private Size _actualSize;
+
+        partial void OnActualSizeChanged(Size oldValue, Size newValue)
+        {
+            if (SourceSize == default)
+            {
+                return;
+            }
+            // ActualSizeの比率をSizeに反映させる
+            double scaleX = newValue.Width / oldValue.Width;
+            double scaleY = newValue.Height / oldValue.Height;
+            Size = new Size(Size.Width * scaleX, Size.Height * scaleY);
+            //Position = new Point(Position.X * scaleX, Position.Y * scaleY);
+            var offset = new Point(newValue.Width - oldValue.Width, newValue.Height - oldValue.Height);
+            Position = new Point(Position.X + offset.X, Position.Y + offset.Y);
+        }
+        // 提出はBoundingBoxのxamlとcs、それとこのファイル
 
         // BoundingBox座標系のポリゴン（描画用）
         [ObservableProperty]

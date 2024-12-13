@@ -21,12 +21,25 @@ namespace WpfCT8Sample.Views.UserControls
     /// </summary>
     public partial class BoundingBox : UserControl, INotifyPropertyChanged
     {
+        public static readonly DependencyProperty TopLeftPositionProperty = DependencyProperty.Register("TopLeftPosition", typeof(Point), typeof(BoundingBox), new PropertyMetadata(default(Point)));
+
+        public Point TopLeftPosition
+        {
+            get => (Point)GetValue(TopLeftPositionProperty);
+        }
+
+        // Center Position
         public static readonly DependencyProperty PositionProperty = DependencyProperty.Register("Position", typeof(Point), typeof(BoundingBox), new PropertyMetadata(default(Point)));
+
 
         public Point Position
         {
             get => (Point)GetValue(PositionProperty);
-            set => SetValue(PositionProperty, value);
+            set
+            {
+                SetValue(PositionProperty, value);
+                SetValue(TopLeftPositionProperty, new Point(value.X - CenterX, value.Y - CenterY));
+            }
         }
 
         public static readonly DependencyProperty SizeProperty = DependencyProperty.Register("Size", typeof(Size), typeof(BoundingBox), new PropertyMetadata(new Size(100, 100), OnSizeOrZoomChanged));
@@ -44,6 +57,8 @@ namespace WpfCT8Sample.Views.UserControls
             get => (double)GetValue(RotationProperty);
             set => SetValue(RotationProperty, value);
         }
+
+        public double RotationRadian { get; set; }
 
         public static readonly DependencyProperty ZoomProperty = DependencyProperty.Register("Zoom", typeof(double), typeof(BoundingBox), new PropertyMetadata(1.0, OnSizeOrZoomChanged));
 
@@ -104,10 +119,56 @@ namespace WpfCT8Sample.Views.UserControls
         }
 
         #region Drag four corners
+
         private void DragTopLeft_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _startPoint = e.GetPosition((IInputElement)Parent);
             Mouse.Capture(dragTopLeft);
+        }
+
+        private void UpdateSizeAndPosition(Vector delta, int widthMultiplier, int heightMultiplier)
+        {
+            // 回転角度をラジアンで取得
+            var angle = RotationRadian;
+
+            // ドラッグ量を回転を考慮して変換
+            var cos = Math.Cos(angle);
+            var sin = Math.Sin(angle);
+            var rotatedDeltaX = (delta.X * cos + delta.Y * sin) / Zoom;
+            var rotatedDeltaY = (-delta.X * sin + delta.Y * cos) / Zoom;
+
+            // 新しいサイズを計算
+            var newWidth = Math.Max(Size.Width + widthMultiplier * rotatedDeltaX, 1);
+            var newHeight = Math.Max(Size.Height + heightMultiplier * rotatedDeltaY, 1);
+
+            // 中心位置の変化量を計算（ドラッグ量の半分）
+            var deltaCenterX = rotatedDeltaX / 2;
+            var deltaCenterY = rotatedDeltaY / 2;
+
+            // 中心位置を更新
+            var newX = Position.X;
+            var newY = Position.Y;
+
+            if (widthMultiplier != 0)
+            {
+                newX += (deltaCenterX * cos - deltaCenterY * sin) * Zoom;
+            }
+
+            if (heightMultiplier != 0)
+            {
+                newY += (deltaCenterX * sin + deltaCenterY * cos) * Zoom;
+            }
+
+            Position = new Point(newX, newY);
+            Size = new Size(newWidth, newHeight);
+        }
+
+        private Vector GetDelta(MouseEventArgs e)
+        {
+            var currentPoint = e.GetPosition((IInputElement)Parent);
+            var delta = currentPoint - _startPoint;
+            _startPoint = currentPoint;
+            return delta;
         }
 
         private void DragTopLeft_MouseMove(object sender, MouseEventArgs e)
@@ -115,18 +176,7 @@ namespace WpfCT8Sample.Views.UserControls
             if (e.LeftButton == MouseButtonState.Released)
                 return;
 
-            var currentPoint = e.GetPosition((IInputElement)Parent);
-            var offset = (currentPoint - _startPoint) / Zoom;
-            _startPoint = currentPoint;
-
-            var newWidth = Math.Max(Size.Width - offset.X, 0);
-            var newX = Math.Min(Position.X + offset.X * Zoom, Position.X + Size.Width);
-
-            var newHeight = Math.Max(Size.Height - offset.Y, 0);
-            var newY = Math.Min(Position.Y + offset.Y * Zoom, Position.Y + Size.Height);
-
-            Size = new Size(newWidth, newHeight);
-            Position = new Point(newX, newY);
+            UpdateSizeAndPosition(GetDelta(e), -1, -1);
         }
 
         private void DragBottomRight_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -140,12 +190,9 @@ namespace WpfCT8Sample.Views.UserControls
             if (e.LeftButton == MouseButtonState.Released)
                 return;
 
-            var currentPoint = e.GetPosition((IInputElement)Parent);
-            var offset = (currentPoint - _startPoint) / Zoom;
-            _startPoint = currentPoint;
-
-            Size = new Size(Math.Max(Size.Width + offset.X, 0), Math.Max(Size.Height + offset.Y, 0));
+            UpdateSizeAndPosition(GetDelta(e), 1, 1);
         }
+
 
         private void DragTopRight_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -158,15 +205,7 @@ namespace WpfCT8Sample.Views.UserControls
             if (e.LeftButton == MouseButtonState.Released)
                 return;
 
-            var currentPoint = e.GetPosition((IInputElement)Parent);
-            var offset = (currentPoint - _startPoint) / Zoom;
-            _startPoint = currentPoint;
-
-            var newHeight = Math.Max(Size.Height - offset.Y, 0);
-            var newY = Math.Min(Position.Y + offset.Y * Zoom, Position.Y + Size.Height);
-
-            Size = new Size(Math.Max(Size.Width + offset.X, 0), newHeight);
-            Position = new Point(Position.X, newY);
+            UpdateSizeAndPosition(GetDelta(e), 1, -1);
         }
 
         private void DragBottomLeft_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -180,15 +219,7 @@ namespace WpfCT8Sample.Views.UserControls
             if (e.LeftButton == MouseButtonState.Released)
                 return;
 
-            var currentPoint = e.GetPosition((IInputElement)Parent);
-            var offset = (currentPoint - _startPoint) / Zoom;
-            _startPoint = currentPoint;
-
-            var newWidth = Math.Max(Size.Width - offset.X, 0);
-            var newX = Math.Min(Position.X + offset.X * Zoom, Position.X + Size.Width);
-
-            Size = new Size(newWidth, Math.Max(Size.Height + offset.Y, 0));
-            Position = new Point(newX, Position.Y);
+            UpdateSizeAndPosition(GetDelta(e), -1, 1);
         }
         #endregion
 
@@ -204,15 +235,7 @@ namespace WpfCT8Sample.Views.UserControls
             if (e.LeftButton == MouseButtonState.Released)
                 return;
 
-            var currentPoint = e.GetPosition((IInputElement)Parent);
-            var offset = (currentPoint - _startPoint) / Zoom;
-            _startPoint = currentPoint;
-
-            var newHeight = Math.Max(Size.Height - offset.Y, 0);
-            var newY = Math.Min(Position.Y + offset.Y * Zoom, Position.Y + Size.Height);
-
-            Size = new Size(Size.Width, newHeight);
-            Position = new Point(Position.X, newY);
+            UpdateSizeAndPosition(GetDelta(e), 0, -1);
         }
 
         private void DragBottom_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -226,11 +249,7 @@ namespace WpfCT8Sample.Views.UserControls
             if (e.LeftButton == MouseButtonState.Released)
                 return;
 
-            var currentPoint = e.GetPosition((IInputElement)Parent);
-            var offset = (currentPoint - _startPoint) / Zoom;
-            _startPoint = currentPoint;
-
-            Size = new Size(Size.Width, Math.Max(Size.Height + offset.Y, 0));
+            UpdateSizeAndPosition(GetDelta(e), 0, 1);
         }
 
         private void DragLeft_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -244,15 +263,7 @@ namespace WpfCT8Sample.Views.UserControls
             if (e.LeftButton == MouseButtonState.Released)
                 return;
 
-            var currentPoint = e.GetPosition((IInputElement)Parent);
-            var offset = (currentPoint - _startPoint) / Zoom;
-            _startPoint = currentPoint;
-
-            var newWidth = Math.Max(Size.Width - offset.X, 0);
-            var newX = Math.Min(Position.X + offset.X * Zoom, Position.X + Size.Width);
-
-            Size = new Size(newWidth, Size.Height);
-            Position = new Point(newX, Position.Y);
+            UpdateSizeAndPosition(GetDelta(e), -1, 0);
         }
 
         private void DragRight_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -266,11 +277,7 @@ namespace WpfCT8Sample.Views.UserControls
             if (e.LeftButton == MouseButtonState.Released)
                 return;
 
-            var currentPoint = e.GetPosition((IInputElement)Parent);
-            var offset = (currentPoint - _startPoint) / Zoom;
-            _startPoint = currentPoint;
-
-            Size = new Size(Math.Max(Size.Width + offset.X, 0), Size.Height);
+            UpdateSizeAndPosition(GetDelta(e), 1, 0);
         }
         #endregion
 
@@ -288,11 +295,12 @@ namespace WpfCT8Sample.Views.UserControls
                 return;
 
             var currentPoint = e.GetPosition((IInputElement)Parent);
-            var centerX = Position.X + CenterX;
-            var centerY = Position.Y + CenterY;
-            double angle = Math.Atan2(currentPoint.Y - centerY, currentPoint.X - centerX) + Math.PI / 2;
+            var center = Position;
+            double angle = Math.Atan2(currentPoint.Y - center.Y, currentPoint.X - center.X) + Math.PI / 2;
             Rotation = angle * 180 / Math.PI;
+            RotationRadian = angle;
         }
+
         #endregion
 
     }
