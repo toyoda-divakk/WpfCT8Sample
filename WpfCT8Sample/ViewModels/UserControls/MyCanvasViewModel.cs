@@ -40,11 +40,9 @@ namespace WpfCT8Sample.ViewModels.UserControls
             double scaleX = newValue.Width / oldValue.Width;
             double scaleY = newValue.Height / oldValue.Height;
             Size = new Size(Size.Width * scaleX, Size.Height * scaleY);
-            //Position = new Point(Position.X * scaleX, Position.Y * scaleY);
-            var offset = new Point(newValue.Width - oldValue.Width, newValue.Height - oldValue.Height);
-            Position = new Point(Position.X + offset.X, Position.Y + offset.Y);
+
+            Position = new Point(Position.X * scaleX, Position.Y * scaleY);
         }
-        // 提出はBoundingBoxのxamlとcs、それとこのファイル
 
         // BoundingBox座標系のポリゴン（描画用）
         [ObservableProperty]
@@ -110,7 +108,7 @@ namespace WpfCT8Sample.ViewModels.UserControls
             bottomLeft = rotateTransform.Transform(bottomLeft);
 
             // 位置を原位置にシフトする変換を作成し、既存の頂点に適用する。  
-            var translateTransform = new TranslateTransform(Position.X + Size.Width / 2, Position.Y + Size.Height / 2);
+            var translateTransform = new TranslateTransform(Position.X, Position.Y);
 
             topLeft = translateTransform.Transform(topLeft);
             topRight = translateTransform.Transform(topRight);

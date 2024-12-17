@@ -26,10 +26,11 @@ namespace WpfCT8Sample.Views.UserControls
         public Point TopLeftPosition
         {
             get => (Point)GetValue(TopLeftPositionProperty);
+            set => SetValue(TopLeftPositionProperty, value);
         }
 
         // Center Position
-        public static readonly DependencyProperty PositionProperty = DependencyProperty.Register("Position", typeof(Point), typeof(BoundingBox), new PropertyMetadata(default(Point)));
+        public static readonly DependencyProperty PositionProperty = DependencyProperty.Register("Position", typeof(Point), typeof(BoundingBox), new PropertyMetadata(default(Point), OnPositionChanged));
 
 
         public Point Position
@@ -37,8 +38,8 @@ namespace WpfCT8Sample.Views.UserControls
             get => (Point)GetValue(PositionProperty);
             set
             {
-                SetValue(PositionProperty, value);
                 SetValue(TopLeftPositionProperty, new Point(value.X - CenterX, value.Y - CenterY));
+                SetValue(PositionProperty, value);
             }
         }
 
@@ -78,6 +79,12 @@ namespace WpfCT8Sample.Views.UserControls
                 boundingBox.OnPropertyChanged(nameof(CenterX));
                 boundingBox.OnPropertyChanged(nameof(CenterY));
             }
+        }
+
+        private static void OnPositionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var box = (BoundingBox)d;
+            box.TopLeftPosition = new Point(box.Position.X - box.CenterX, box.Position.Y - box.CenterY);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
